@@ -24,7 +24,7 @@ export default function EditDepartmentForm({data,departmentId}:EditRoleProps) {
     }})
 
     const queryClient = useQueryClient();
-    const {mutate} = useMutation({
+    const {mutate,isPending} = useMutation({
         mutationFn: updateDepartmentAPI,
         onError:(error) =>{
             toast.error(error.message)
@@ -83,9 +83,17 @@ export default function EditDepartmentForm({data,departmentId}:EditRoleProps) {
                       <CreateDepartmentForm register={register} errors={errors}/>
                       <button
                           type="submit"
-                          className="form-submit"
+                          disabled={isPending}
+                          className="form-submit" 
                       >
-                          Guardar Cambios
+                        {isPending ? (
+                            <span className="flex items-center gap-2">
+                                <span className="animate-spin">⏳</span>
+                                Guardando...
+                            </span>
+                        ) : (
+                            "Guardar cambios"
+                        )}
                       </button>
                       </form>
                   </div>

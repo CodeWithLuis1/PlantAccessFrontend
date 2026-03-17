@@ -64,8 +64,19 @@ export default function CreateDepartment() {
                           noValidate
                         >
                           <CreateDepartmentForm register={register} errors={errors} />
-                          <button type="submit" className="form-submit">
-                            Crear Departamento
+                          <button type="submit"
+                             disabled={isPending}
+                             className="form-submit" 
+
+                          >
+                            {isPending ? (
+                                <span className="flex items-center gap-2">
+                                    <span className="animate-spin">⏳</span>
+                                    Creando...
+                                </span>
+                            ) : (
+                                "Crear departamento"
+                            )}
                           </button>
                         </form>
                 </div>

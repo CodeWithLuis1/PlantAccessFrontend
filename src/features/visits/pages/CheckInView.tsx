@@ -80,8 +80,18 @@ export default function CheckInView() {
                     <FormProvider {...methods}>
                         <form className="form-card-body" onSubmit={methods.handleSubmit(handleForm)} noValidate>
                             <CheckInForm visitorId={visit?.visitor_id ?? 0} />
-                            <button type="submit" className="form-submit" disabled={isPending}>
-                                {isPending ? "Registrando..." : "Confirmar entrada"}
+                            <button type="submit" 
+                                className="form-submit" 
+                                disabled={isPending}
+                            >
+                                {isPending?(
+                                  <span className="flex items-center gap-2">
+                                        <span className="animate-spin">⏳</span>
+                                        Registrando....
+                                 </span>
+                                ):(
+                                    "Confirmar entrada"
+                                )}
                             </button>
                         </form>
                     </FormProvider>

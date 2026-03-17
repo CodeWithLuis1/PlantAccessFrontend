@@ -13,7 +13,7 @@ export default function CreateRol() {
   } = useForm<CreateRolFormData>({ defaultValues: initialValues, mode: "onChange" });
 
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: (data: CreateRolFormData) => createRoleAPI(data),
     onError:(error) => {
         toast.error(error.message)
@@ -21,7 +21,7 @@ export default function CreateRol() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
       toast.success(data?.message);
-      navigate("/rol");
+      navigate("/role");
     },
   });
 
@@ -35,7 +35,7 @@ export default function CreateRol() {
         </div>
 
         <div className="form-nav">
-          <Link to="/rol" className="form-nav-back">
+          <Link to="/role" className="form-nav-back">
             <svg
               className="w-5 h-5"
               fill="none"
@@ -61,8 +61,15 @@ export default function CreateRol() {
             noValidate
           >
             <CrearRolForm register={register} errors={errors} />
-            <button type="submit" className="form-submit">
-              Crear Rol
+            <button type="submit" className="form-submit" disabled={isPending}>
+              {isPending?(
+                    <span className="flex items-center gap-2">
+                        <span className="animate-spin">⏳</span>
+                                Guardando...
+                    </span>
+              ):(
+                "Crear Rol"
+              )}
             </button>
           </form>
         </div>

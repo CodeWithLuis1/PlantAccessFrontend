@@ -17,7 +17,7 @@ export default function CreateUserView() {
   });
   
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: createUserAPI,
     onError: (error) => toast.error(error.message),
     onSuccess: (response) => {
@@ -71,8 +71,17 @@ export default function CreateUserView() {
             <button
               type="submit"
               className="form-submit"
+              disabled={isPending}
             >
-              Crear Usuario
+              {isPending?(
+                  <span className="flex items-center gap-2">
+                      <span className="animate-spin">⏳</span>
+                      Creando...
+                  </span>
+              ):(
+                "Crear Usuario"
+              )}
+              
             </button>
           </form>
         </div>

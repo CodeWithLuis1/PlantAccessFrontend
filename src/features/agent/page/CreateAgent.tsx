@@ -67,8 +67,18 @@ export default function CreateAgent() {
             noValidate
           >
             <CreateAgentForm register={register} errors={errors} />
-            <button type="submit" className="form-submit">
-              Crear Agente
+            <button type="submit"
+             disabled={isPending}
+              className="form-submit" 
+             >
+            {isPending ? (
+              <span className="flex items-center gap-2">
+                <span className="animate-spin">⏳</span>
+                Creando...
+              </span>
+            ) : (
+              "Crear Agente"
+            )}
             </button>
           </form>
         </div>

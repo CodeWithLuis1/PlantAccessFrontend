@@ -19,7 +19,7 @@ export default function EditCompanyForm({data, companyId}:EditCompanyFormProps) 
     }})
 
     const queryClient = useQueryClient();
-    const {mutate} = useMutation({
+    const {mutate,isPending} = useMutation({
         mutationFn: updateCompanyAPI,
         onError:(error) =>{
             toast.error(error.message)
@@ -80,9 +80,17 @@ export default function EditCompanyForm({data, companyId}:EditCompanyFormProps) 
                       <CreateCompanyForm register={register} errors={errors}/>
                       <button
                           type="submit"
-                          className="form-submit"
+                          className="form-submit" 
+                          disabled={isPending}
                       >
-                          Guardar Cambios
+                          {isPending ? (
+                          <span className="flex items-center gap-2">
+                             <span className="animate-spin">⏳</span>
+                            Guardando...
+                          </span>
+                            ) : (
+                            "Guardar Cambios"
+                            )}
                       </button>
                       </form>
                   </div>

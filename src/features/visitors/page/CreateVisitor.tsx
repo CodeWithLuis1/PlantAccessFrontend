@@ -62,8 +62,19 @@ export default function CreateVisitor() {
                             noValidate
                         >
                             <CreateVisitorForm />
-                            <button type="submit" className="form-submit">
-                                Crear Visitante
+                            <button 
+                                type="submit"
+                                disabled={isPending}
+                                className="form-submit" 
+                            >
+                                {isPending?(
+                                    <span className="flex items-center gap-2">
+                                        <span className="animate-spin">⏳</span>
+                                        Guardando...
+                                    </span>
+                                ):(
+                                    "Crear Visitante"
+                                )}
                             </button>
                         </form>
                     </FormProvider>

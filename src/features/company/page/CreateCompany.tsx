@@ -25,13 +25,11 @@ export default function CreateCompany() {
       }
   })
 
-  const handleForm = async (formData: CreateCompanyFormData ) =>{
-    if(isPending)
-      return;
+  const handleForm = (formData: CreateCompanyFormData) => {
       mutate(formData)
   };
 
-  return (
+ return (
     <div className="form-page">
       <div className="form-page-inner">
         <div className="form-page-header">
@@ -63,8 +61,18 @@ export default function CreateCompany() {
               noValidate
             >
               <CreateCompanyForm register={register} errors={errors} />
-              <button type="submit" className="form-submit">
-                Crear Empresa
+              <button type="submit"
+                className="form-submit" 
+                disabled={isPending}
+              >
+                {isPending ? (
+                  <span className="flex items-center gap-2">
+                    <span className="animate-spin">⏳</span>
+                      Creando...
+                  </span>
+                    ) : (
+                      "Crear Empresa"
+                )}
               </button>
             </form>
         </div>

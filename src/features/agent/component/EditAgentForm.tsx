@@ -20,7 +20,7 @@ export default function EditAgentForm({data, agentId}:EditAgentFormProps) {
     }});
 
     const queryClient = useQueryClient();
-    const {mutate} = useMutation({
+    const {mutate, isPending} = useMutation({
         mutationFn: updateAgentAPI,
         onError:(error) => {
             toast.error(error.message)
@@ -78,10 +78,18 @@ export default function EditAgentForm({data, agentId}:EditAgentFormProps) {
                      >
                      <CreateAgentForm register={register} errors={errors} />
                      <button
-                         type="submit"
-                         className="form-submit"
+                        type="submit"
+                        disabled={isPending}
+                        className="form-submit" 
                      >
-                         Guardar Cambios
+                        {isPending ? (
+                        <span className="flex items-center gap-2">
+                        <span className="animate-spin">⏳</span>
+                        Guardando...
+                        </span>
+                        ) : (
+                            "Guardar cambios"
+                        )}
                      </button>
                      </form>
                  </div>

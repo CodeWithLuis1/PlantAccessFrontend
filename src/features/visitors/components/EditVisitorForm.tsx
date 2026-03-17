@@ -25,7 +25,7 @@ export default function EditVisitorForm({data, visitorId}:EditVisitorProps) {
         license_photo: data.license_photo,
     }})
     const queryClient = useQueryClient();
-    const {mutate} = useMutation({
+    const {mutate, isPending} = useMutation({
         mutationFn: updateVisitorAPI,
         onError:(error) =>{
             toast.error(error.message)
@@ -85,9 +85,17 @@ export default function EditVisitorForm({data, visitorId}:EditVisitorProps) {
                       <CreateVisitorForm initialDpiImage={data.document_photo} initialLicenseImage={data.license_photo} />
                       <button
                           type="submit"
-                          className="form-submit"
-                      >
-                          Guardar Cambios
+                          disabled={isPending}
+                          className="form-submit" 
+                      > 
+                        {isPending?(
+                            <span className="flex items-center gap-2">
+                                <span className="animate-spin">⏳</span>
+                                Guardando...
+                            </span>
+                        ):(
+                            "Guardar Cambios"
+                        )}
                       </button>
                       </form>
                       </FormProvider>

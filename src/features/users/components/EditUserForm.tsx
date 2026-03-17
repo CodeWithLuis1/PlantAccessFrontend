@@ -25,7 +25,7 @@ export default function EditUserForm({data, userId}:EditUserFormProps) {
     }})
 
     const queryClient = useQueryClient();
-    const {mutate} = useMutation({
+    const {mutate, isPending} = useMutation({
         mutationFn: updateUserAPI,
         onError:(error) =>{
             toast.error(error.message)
@@ -86,8 +86,17 @@ export default function EditUserForm({data, userId}:EditUserFormProps) {
                     <button
                         type="submit"
                         className="form-submit"
+                        disabled={isPending}
                     >
-                        Guardar Cambios
+                        {isPending?(
+                            <span className="flex items-center gap-2">
+                                <span className="animate-spin">⏳</span>
+                                Creando...
+                            </span>
+                        ):(
+                            "Guardar Cambios"
+                        )}
+                        
                     </button>
                     </form>
                 </div>

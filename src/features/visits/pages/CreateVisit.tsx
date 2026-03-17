@@ -57,8 +57,19 @@ export default function CreateVisit() {
                     <FormProvider {...methods}>
                         <form className="form-card-body" onSubmit={methods.handleSubmit(handleForm)} noValidate>
                             <CreateVisitForm />
-                            <button type="submit" className="form-submit" disabled={isPending}>
-                                {isPending ? "Guardando..." : "Programar visita"}
+                            <button type="submit"
+                                disabled={isPending}
+                                className="form-submit" 
+                            >
+                                {isPending?(
+                                  <span className="flex items-center gap-2">
+                                        <span className="animate-spin">⏳</span>
+                                        Creando...
+                                 </span>
+                                ):(
+                                    "Crear Visita"
+                                )}
+
                             </button>
                         </form>
                     </FormProvider>

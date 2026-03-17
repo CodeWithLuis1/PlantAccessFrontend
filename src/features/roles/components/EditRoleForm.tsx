@@ -21,7 +21,7 @@ export default function EditRoleForm({data, roleId}:EditRoleProps) {
     }})
 
     const queryClient = useQueryClient();
-    const {mutate} = useMutation({
+    const {mutate,isPending} = useMutation({
         mutationFn: updateRoleAPI,
         onError: (error) =>{
             toast.error(error.message)
@@ -82,8 +82,16 @@ export default function EditRoleForm({data, roleId}:EditRoleProps) {
                       <button
                           type="submit"
                           className="form-submit"
+                          disabled={isPending}
                       >
-                          Guardar Cambios
+                          {isPending?(
+                            <span className="flex items-center gap-2">
+                                <span className="animate-spin">⏳</span>
+                                Creando...
+                            </span>
+                          ):(
+                            "Guardar Cambios"
+                          )}
                       </button>
                       </form>
                   </div>
