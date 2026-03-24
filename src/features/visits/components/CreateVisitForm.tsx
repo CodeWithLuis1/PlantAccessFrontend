@@ -188,7 +188,8 @@ export default function CreateVisitForm() {
                     id="responsible_person"
                     type="text"
                     placeholder="Nombre de quien recibe la visita"
-                    className={`form-input ${errors.responsible_person ? "form-input-error" : "form-input-normal"}`}
+                    readOnly
+                    className={`form-input form-input-normal bg-slate-50 cursor-default`}
                     {...register("responsible_person", {
                         setValueAs: toUpper,
                         required: "La persona responsable es obligatoria",

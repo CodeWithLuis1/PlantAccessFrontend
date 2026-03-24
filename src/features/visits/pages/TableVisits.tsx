@@ -1,10 +1,12 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import { useQuery } from "@tanstack/react-query"
-import {TableContainer, TableHeader, Table, TableHead, TableBody,TableRow, Th, Td, TableEmpty, TableActions} from "@/shared/components/ui/StyledTable"
-import { Pencil, Eye, X } from "lucide-react";
-import { getVisitsAPI } from "@/features/visits/api/VisitAPI"
-import PaginationComponent from "@/shared/components/PaginationComponent";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { TableContainer, TableHeader, Table, TableHead, TableBody, TableRow, Th, Td, TableEmpty, TableActions } from "@/shared/components/ui/StyledTable"
+import { Pencil, Eye, X, Trash2 } from "lucide-react"
+import { toast } from "react-toastify"
+import { getVisitsAPI, deleteVisitAPI } from "@/features/visits/api/VisitAPI"
+import PaginationComponent from "@/shared/components/PaginationComponent"
+import { useAuth } from "@/hooks/useAuth"
 
 const STATUS_BADGE: Record<string, string> = {
     PROGRAMADA: "badge-warning",
@@ -42,13 +44,65 @@ function PhotoPreviewModal({ url, onClose }: { url: string; onClose: () => void 
                 />
             </div>
         </div>
-    );
+    )
+}
+
+// Inline delete confirmation modal — shown when user clicks the trash button
+function ConfirmDeleteModal({ visitId, onClose }: { visitId: number; onClose: () => void }) {
+    const queryClient = useQueryClient()
+
+    const { mutate, isPending } = useMutation({
+        mutationFn: () => deleteVisitAPI(visitId),
+        onError: (error) => { toast.error(error.message); onClose() },
+        onSuccess: (data) => {
+            queryClient.invalidateQueries({ queryKey: ["visits"] })
+            toast.success(data.message)
+            onClose()
+        },
+    })
+
+    return (
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+            onClick={onClose}
+        >
+            <div
+                className="relative bg-white rounded-lg shadow-xl w-full max-w-sm p-6 space-y-4"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <h2 className="text-base font-semibold text-slate-800">Eliminar visita #{visitId}</h2>
+                <p className="text-sm text-slate-600">
+                    ¿Estás seguro? Esta acción no se puede deshacer.
+                </p>
+                <div className="flex gap-3 justify-end">
+                    <button
+                        onClick={onClose}
+                        disabled={isPending}
+                        className="px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-medium transition-colors"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        onClick={() => mutate()}
+                        disabled={isPending}
+                        className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                        {isPending ? "Eliminando..." : "Sí, eliminar"}
+                    </button>
+                </div>
+            </div>
+        </div>
+    )
 }
 
 export default function TableVisits() {
+    const { permissions } = useAuth()
+    const canDelete = permissions.includes("visits:delete")
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1)
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+    // ID of the visit pending delete confirmation, null when no modal open
+    const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null)
 
     const today = new Date().toISOString().split("T")[0]
     const [selectedDate, setSelectedDate] = useState(today)
@@ -62,17 +116,19 @@ export default function TableVisits() {
     if (isError) return <p className="p-8 text-center text-red-500">Error al cargar las visitas.</p>
 
     const list = data?.visits ?? []
-    const totalPages = data?.lastPage ?? 1;
-
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
+    const totalPages = data?.lastPage ?? 1
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-slate-100 p-4">
             {previewUrl && (
-            <PhotoPreviewModal url={previewUrl} onClose={() => setPreviewUrl(null)} />
-             )}
+                <PhotoPreviewModal url={previewUrl} onClose={() => setPreviewUrl(null)} />
+            )}
+            {confirmDeleteId !== null && (
+                <ConfirmDeleteModal
+                    visitId={confirmDeleteId}
+                    onClose={() => setConfirmDeleteId(null)}
+                />
+            )}
             <div className="max-w-7xl w-full">
                 <TableContainer>
                     <TableHeader
@@ -86,7 +142,7 @@ export default function TableVisits() {
                         <input
                             type="date"
                             value={selectedDate}
-                            onChange={e => { setSelectedDate(e.target.value); setCurrentPage(1); }}
+                            onChange={e => { setSelectedDate(e.target.value); setCurrentPage(1) }}
                             className="form-input form-input-normal text-sm py-1 w-48"
                         />
                         {selectedDate !== today && (
@@ -191,6 +247,16 @@ export default function TableVisits() {
                                                 >
                                                     <Pencil size={16} />
                                                 </Link>
+                                                {/* Delete button — only for PROGRAMADA visits and users with visits:delete permission */}
+                                                {canDelete && visit.visit_status?.name === "PROGRAMADA" && (
+                                                    <button
+                                                        onClick={() => setConfirmDeleteId(visit.id)}
+                                                        className="btn-icon btn-icon-danger"
+                                                        title="Eliminar visita"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                )}
                                             </TableActions>
                                         </Td>
                                     </TableRow>
@@ -198,15 +264,13 @@ export default function TableVisits() {
                             </TableBody>
                         </Table>
                     ) : (
-                        <TableEmpty
-                            message="No hay visitas registradas para esta fecha"
-                        />
+                        <TableEmpty message="No hay visitas registradas para esta fecha" />
                     )}
 
                     <PaginationComponent
                         currentPage={currentPage}
                         totalPages={totalPages}
-                        onPageChange={handlePageChange}
+                        onPageChange={(page) => setCurrentPage(page)}
                     />
                 </TableContainer>
             </div>

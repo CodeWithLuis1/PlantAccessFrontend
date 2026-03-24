@@ -109,6 +109,30 @@ export async function getVisitorsForSelectAPI() {
     }
 }
 
+export async function updateVisitAPI({ visitId, formData }: { visitId: number; formData: CreateVisitFormData }) {
+    try {
+        const { data } = await api.patch(`/visit/${visitId}`, formData)
+        return data
+    } catch (error) {
+        if (isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.message)
+        }
+        throw error
+    }
+}
+
+export async function deleteVisitAPI(visitId: number) {
+    try {
+        const { data } = await api.delete(`/visit/${visitId}`)
+        return data
+    } catch (error) {
+        if (isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.message)
+        }
+        throw error
+    }
+}
+
 // Obtener personas de un visitante/empresa especifico (para el select del check-in)
 export async function getVisitorPersonsByVisitorAPI(visitorId: number) {
     try {

@@ -5,10 +5,12 @@ import { toast } from "react-toastify"
 import CreateVisitForm from "@/features/visits/components/CreateVisitForm"
 import type { CreateVisitFormData } from "@/features/visits/schema/Types"
 import { createVisitAPI } from "@/features/visits/api/VisitAPI"
+import { useAuth } from "@/hooks/useAuth"
 
 export default function CreateVisit() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
+    const { user } = useAuth()
 
     const today = new Date().toISOString().split("T")[0]
 
@@ -17,7 +19,7 @@ export default function CreateVisit() {
         visitor_person_id: 0,
         date: today,
         department_id: 0,
-        responsible_person: "",
+        responsible_person: user?.name?.toUpperCase() ?? "",
         destination: "",
         companions: [],
     }

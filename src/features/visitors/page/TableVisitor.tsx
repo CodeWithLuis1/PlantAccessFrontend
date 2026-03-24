@@ -40,7 +40,7 @@ export default function TableVisitor() {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     const {data, isLoading, isError} = useQuery({
-        queryKey: ["visitor", currentPage, pageSize],
+        queryKey: ["visitors", currentPage, pageSize],
         queryFn: () => getVisitorAPI(currentPage)
     })
 
