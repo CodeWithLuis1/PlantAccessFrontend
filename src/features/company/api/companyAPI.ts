@@ -5,7 +5,7 @@ import {getCompanyResponse,companyForSelectSchema, getCompanyByIdSchema}  from "
 
 export async function createCompanyAPI(formData: CreateCompanyFormData) {
     try {
-        const {data} = await api.post("/visitor",formData)
+        const {data} = await api.post("/company",formData)
         return data;
     } catch (error) {
         if(isAxiosError(error)&& error.response){
@@ -17,7 +17,7 @@ export async function createCompanyAPI(formData: CreateCompanyFormData) {
 export async function getCompanyAPI(page: number = 1) {
     try {
         const limit = 10;
-        const {data} = await api.get("/visitor", {params:{page, limit}});
+        const {data} = await api.get("/company", {params:{page, limit}});
         const response = getCompanyResponse.safeParse(data);
         return response.data;
     } catch (error) {
@@ -32,7 +32,7 @@ export async function getCompanyAPI(page: number = 1) {
 
 export async function getCompanyForSelectAPI() {
     try {
-        const {data} = await api.get("/visitor", { params: { all: true } })
+        const {data} = await api.get("/company", { params: { all: true } })
         const parsedData = companyForSelectSchema
             .array()
             .safeParse(data.response);
@@ -49,7 +49,7 @@ export async function getCompanyForSelectAPI() {
 
 export async function getCompanyByIdAPI(companyId: number) {
     try {
-        const {data} = await api.get(`/visitor/${companyId}`)
+        const {data} = await api.get(`/company/${companyId}`)
         const response = getCompanyByIdSchema.safeParse(data.data)
         if(!response.success){
             throw new Error("Error al validar los datos del visitante")
@@ -70,7 +70,7 @@ type CompanyAPIType = {
 
 export async function updateCompanyAPI({companyId, formData}:CompanyAPIType) {
     try {
-        const {data} = await api.patch(`/visitor/${companyId}`, formData)
+        const {data} = await api.patch(`/company/${companyId}`, formData)
         return data
 
     } catch (error) { 

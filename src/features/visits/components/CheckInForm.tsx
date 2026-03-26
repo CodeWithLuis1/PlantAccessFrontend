@@ -1,4 +1,3 @@
-import { useEffect } from "react"
 import { useFormContext, Controller, useFieldArray } from "react-hook-form"
 import { useQuery } from "@tanstack/react-query"
 import Select from "react-select"
@@ -14,13 +13,7 @@ type CheckInFormProps = {
 
 export default function CheckInForm({ visit }: CheckInFormProps) {
     const { register, control, formState: { errors } } = useFormContext<CheckInFormData>()
-    const { fields, replace } = useFieldArray({ control, name: "companions" })
-
-    useEffect(() => {
-        if (visit?.visit_companions) {
-            replace(visit.visit_companions.map(() => ({ badge_number: "" })))
-        }
-    }, [visit?.visit_companions, replace])
+    const { fields } = useFieldArray({ control, name: "companions" })
 
     const { data: agents } = useQuery({
         queryKey: ["agent-select"],
@@ -37,8 +30,8 @@ export default function CheckInForm({ visit }: CheckInFormProps) {
             <div className="form-group">
                 <label className="form-label">Persona que llegó</label>
                 <p className="form-input form-input-normal bg-slate-50 text-slate-700">
-                    {visit.visitor_person
-                        ? `${visit.visitor_person.name} - DPI: ${visit.visitor_person.document_number}`
+                    {visit.company_person
+                        ? `${visit.company_person.name} - DPI: ${visit.company_person.document_number}`
                         : "—"}
                 </p>
             </div>
@@ -105,8 +98,8 @@ export default function CheckInForm({ visit }: CheckInFormProps) {
                             <div key={field.id} className="border border-slate-200 rounded-lg p-3 mb-2 space-y-2">
                                 <p className="text-sm font-medium text-slate-600">Acompañante {index + 1}</p>
                                 <p className="text-sm text-slate-700 bg-slate-50 rounded px-3 py-2">
-                                    {companion?.visitor_person
-                                        ? `${companion.visitor_person.name} - DPI: ${companion.visitor_person.document_number}`
+                                    {companion?.company_person
+                                        ? `${companion.company_person.name} - DPI: ${companion.company_person.document_number}`
                                         : "—"}
                                 </p>
                                 <input

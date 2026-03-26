@@ -15,7 +15,7 @@ export default defineConfig({
     // Use jsdom so browser globals (window, document) are available in tests
     environment: 'jsdom',
     // Automatically import @testing-library/jest-dom matchers (toBeInTheDocument, etc.)
-    setupFiles: [],
+    setupFiles: ['./src/__tests__/setup.ts'],
     globals: true,
   },
 })

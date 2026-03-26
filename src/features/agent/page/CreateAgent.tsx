@@ -22,6 +22,7 @@ export default function CreateAgent() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["agents"]});
+      queryClient.invalidateQueries({ queryKey: ["agent-select"]});
       toast.success(data.message);
       navigate("/agent");
     }

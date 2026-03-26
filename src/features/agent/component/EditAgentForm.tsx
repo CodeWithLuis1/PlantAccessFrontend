@@ -28,6 +28,7 @@ export default function EditAgentForm({data, agentId}:EditAgentFormProps) {
         onSuccess:(data)=>{
             queryClient.invalidateQueries({queryKey:['agents']})
             queryClient.invalidateQueries({queryKey:['editAgent', agentId]})
+            queryClient.invalidateQueries({queryKey:['agent-select']})
             toast.success(data.message)
             navigate('/agent')
         }

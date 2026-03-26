@@ -9,10 +9,10 @@ import {createVisitorAPI} from "@/features/visitors/api/VisitorsAPI"
 
 export default function CreateVisitor() {
     const navigate = useNavigate();
-    const initialValues: CreateVisitorFormData = {visitor_id: 0, name: "", document_number:"",document_photo:"",license_number:"",license_photo:""};
+    const initialValues: CreateVisitorFormData = { company_id: 0, name: "", document_number: "", document_photo_front: "", document_photo_back: "", license_number: "", license_photo: "" };
     const methods = useForm({ defaultValues: initialValues, mode: "onChange" })
     const queryClient = useQueryClient()
-    
+
     const {mutate, isPending} = useMutation({
         mutationFn: createVisitorAPI,
             onError:(error)=> {
@@ -20,15 +20,16 @@ export default function CreateVisitor() {
             },
             onSuccess:(data) => {
                 queryClient.invalidateQueries({queryKey:["visitors"]})
+                queryClient.invalidateQueries({queryKey:["visitor-persons-select"]})
                 toast.success(data.message)
-                navigate("/visitor")
+                navigate("/people")
             }
     })
     const handleForm = async (formData: CreateVisitorFormData)=>{
         if(isPending)
             return;
-        if(!formData.document_photo && !formData.license_photo){
-            toast.error("Debe agregar al menos una fotografía (DPI o Licencia)");
+        if(!formData.document_photo_front && !formData.license_photo){
+            toast.error("Debe agregar al menos una fotografía (DPI frontal o Licencia)");
             return;
         }
         mutate(formData)
@@ -40,7 +41,7 @@ export default function CreateVisitor() {
                     <h1 className="form-page-title"> Crear nuevo visitante</h1>
                 </div>
                 <div className="form-nav">
-                    <Link to ="/visitor" className="form-nav-back" >
+                    <Link to="/people" className="form-nav-back" >
                         <svg
                         className="w-5 h-5"
                         fill="none"

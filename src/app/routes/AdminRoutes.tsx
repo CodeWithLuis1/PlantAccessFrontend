@@ -4,8 +4,9 @@ import AppLayout from '@/app/layouts/AppLayout';
 import { Spinner } from "@/shared/components/Spinner";
 import ProtectedRoute from "@/shared/components/ProtectedRoute";
 
-const NotFound    = lazy(() => import("@/app/pages/NotFound"));
-const Forbidden   = lazy(() => import("@/app/pages/Forbidden"));
+const NotFound      = lazy(() => import("@/app/pages/NotFound"));
+const Forbidden     = lazy(() => import("@/app/pages/Forbidden"));
+const DoYouNeedHelp = lazy(() => import("@/features/needHelp/page/DoYouNeedHelp"));
 
 const routes = [
   { path: "/role",              component: lazy(() => import("@/features/roles/pages/TableRoleView")),      permission: "roles:view" },
@@ -28,9 +29,9 @@ const routes = [
   { path: "/department/create", component: lazy(() => import("@/features/department/page/CreateDepartment")),  permission: "departments:create" },
   { path: "/department/:departmentId/edit", component: lazy(() => import("@/features/department/page/EditDepartment")), permission: "departments:edit" },
 
-  { path: "/visitor",           component: lazy(() => import("@/features/visitors/page/TableVisitor")),     permission: "visitors:view" },
-  { path: "/visitor/create",    component: lazy(() => import("@/features/visitors/page/CreateVisitor")),    permission: "visitors:create" },
-  { path: "/visitor/:visitorId/edit", component: lazy(() => import("@/features/visitors/page/EditVisitor")), permission: "visitors:edit" },
+  { path: "/people",           component: lazy(() => import("@/features/visitors/page/TableVisitor")),     permission: "people:view" },
+  { path: "/people/create",    component: lazy(() => import("@/features/visitors/page/CreateVisitor")),    permission: "people:create" },
+  { path: "/people/:visitorId/edit", component: lazy(() => import("@/features/visitors/page/EditVisitor")), permission: "people:edit" },
 
   { path: "/report",            component: lazy(() => import("@/features/visitReport/page/DashboardView")), permission: "reports:view" },
 
@@ -45,9 +46,10 @@ export default function AdminRoutes() {
   return (
     <Route element={<ProtectedRoute />}>
       <Route element={<AppLayout />}>
-        <Route path="/403" element={<Suspense fallback={<Spinner />}><Forbidden /></Suspense>} />
-        <Route path="/404" element={<Suspense fallback={<Spinner />}><NotFound /></Suspense>} />
-        <Route path="*"    element={<Suspense fallback={<Spinner />}><NotFound /></Suspense>} />
+        <Route path="/403"  element={<Suspense fallback={<Spinner />}><Forbidden /></Suspense>} />
+        <Route path="/404"  element={<Suspense fallback={<Spinner />}><NotFound /></Suspense>} />
+        <Route path="/help" element={<Suspense fallback={<Spinner />}><DoYouNeedHelp /></Suspense>} />
+        <Route path="*"     element={<Suspense fallback={<Spinner />}><NotFound /></Suspense>} />
 
         {routes.map(({ path, component: Component, permission }) => (
           <Route

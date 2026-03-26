@@ -5,16 +5,15 @@ import { ErrorMessage } from "@/shared/components/ErrorMessage"
 import { toUpper } from "@/shared/helpers/textTransformUppercase"
 import { searchableSelectStyles, getSelectClassNames } from "@/shared/components/ui/searchableSelectStyles"
 import type { CreateVisitFormData } from "@/features/visits/schema/Types"
-import { getVisitorsForSelectAPI } from "@/features/visits/api/VisitAPI"
+import { getVisitorsForSelectAPI, getVisitorPersonsByVisitorAPI } from "@/features/visits/api/VisitAPI"
 import { departmentForSelectAPI } from "@/features/department/api/departmentAPI"
 import { Plus, Trash2 } from "lucide-react"
-import { getVisitorPersonsByVisitorAPI } from "@/features/visits/api/VisitAPI"
 
 export default function CreateVisitForm() {
     const { register, control, watch, formState: { errors } } = useFormContext<CreateVisitFormData>()
     const { fields, append, remove } = useFieldArray({ control, name: "companions" })
 
-    const visitorId = watch("visitor_id")
+    const companyId = watch("company_id")
 
     const { data: visitors } = useQuery({
         queryKey: ["visitors-select"],
@@ -27,9 +26,9 @@ export default function CreateVisitForm() {
     })
 
     const { data: visitorPersons } = useQuery({
-        queryKey: ["visitor-persons-select", visitorId],
-        queryFn: () => getVisitorPersonsByVisitorAPI(visitorId),
-        enabled: !!visitorId && visitorId > 0,
+        queryKey: ["visitor-persons-select", companyId],
+        queryFn: () => getVisitorPersonsByVisitorAPI(companyId),
+        enabled: !!companyId && companyId > 0,
     })
 
     const visitorOptions = visitors?.map(v => ({ value: v.id, label: v.name })) ?? []
@@ -43,7 +42,7 @@ export default function CreateVisitForm() {
                     Visitante / Empresa <span className="required">*</span>
                 </label>
                 <Controller
-                    name="visitor_id"
+                    name="company_id"
                     control={control}
                     rules={{ required: "El visitante es obligatorio" }}
                     render={({ field }) => (
@@ -56,12 +55,12 @@ export default function CreateVisitForm() {
                             noOptionsMessage={() => "No se encontraron visitantes"}
                             value={visitorOptions.find(o => o.value === field.value) || null}
                             onChange={selected => field.onChange(selected?.value ?? null)}
-                            classNames={getSelectClassNames(!!errors.visitor_id)}
+                            classNames={getSelectClassNames(!!errors.company_id)}
                             styles={searchableSelectStyles}
                         />
                     )}
                 />
-                {errors.visitor_id && <ErrorMessage>{errors.visitor_id.message}</ErrorMessage>}
+                {errors.company_id && <ErrorMessage>{errors.company_id.message}</ErrorMessage>}
             </div>
 
             <div className="form-group">
@@ -69,7 +68,7 @@ export default function CreateVisitForm() {
                     Persona que llegará <span className="required">*</span>
                 </label>
                 <Controller
-                    name="visitor_person_id"
+                    name="company_person_id"
                     control={control}
                     rules={{ required: "Debe seleccionar la persona que llegará" }}
                     render={({ field }) => (
@@ -79,16 +78,16 @@ export default function CreateVisitForm() {
                             placeholder="Seleccionar persona..."
                             isClearable
                             isSearchable
-                            isDisabled={!visitorId || visitorId === 0}
+                            isDisabled={!companyId || companyId === 0}
                             noOptionsMessage={() => "No hay personas registradas para este visitante"}
                             value={personOptions.find(o => o.value === field.value) || null}
                             onChange={selected => field.onChange(selected?.value ?? null)}
-                            classNames={getSelectClassNames(!!errors.visitor_person_id)}
+                            classNames={getSelectClassNames(!!errors.company_person_id)}
                             styles={searchableSelectStyles}
                         />
                     )}
                 />
-                {errors.visitor_person_id && <ErrorMessage>{errors.visitor_person_id.message}</ErrorMessage>}
+                {errors.company_person_id && <ErrorMessage>{errors.company_person_id.message}</ErrorMessage>}
             </div>
 
             <div className="form-group">
@@ -96,9 +95,9 @@ export default function CreateVisitForm() {
                     <label className="form-label mb-0">Acompañantes</label>
                     <button
                         type="button"
-                        onClick={() => append({ visitor_person_id: 0 })}
+                        onClick={() => append({ company_person_id: 0 })}
                         className="flex items-center gap-1 text-sm text-amber-600 hover:text-amber-700 font-medium"
-                        disabled={!visitorId || visitorId === 0}
+                        disabled={!companyId || companyId === 0}
                     >
                         <Plus size={16} /> Agregar acompañante
                     </button>
@@ -121,7 +120,7 @@ export default function CreateVisitForm() {
                             </button>
                         </div>
                         <Controller
-                            name={`companions.${index}.visitor_person_id` as `companions.${number}.visitor_person_id`}
+                            name={`companions.${index}.company_person_id` as `companions.${number}.company_person_id`}
                             control={control}
                             rules={{ required: true }}
                             render={({ field: f }) => (
@@ -189,7 +188,7 @@ export default function CreateVisitForm() {
                     type="text"
                     placeholder="Nombre de quien recibe la visita"
                     readOnly
-                    className={`form-input form-input-normal bg-slate-50 cursor-default`}
+                    className="form-input form-input-normal bg-slate-50 cursor-default"
                     {...register("responsible_person", {
                         setValueAs: toUpper,
                         required: "La persona responsable es obligatoria",

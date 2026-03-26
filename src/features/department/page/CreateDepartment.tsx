@@ -21,6 +21,7 @@ export default function CreateDepartment() {
         },
         onSuccess:(data) =>{
             queryClient.invalidateQueries({queryKey:["departments"]})
+            queryClient.invalidateQueries({queryKey:["department-select"]})
             toast.success(data.message)
             navigate("/department")
         }

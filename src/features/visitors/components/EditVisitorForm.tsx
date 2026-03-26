@@ -5,11 +5,11 @@ import {toast} from "react-toastify"
 import { useNavigate } from "react-router";
 
 import CreateVisitorForm from "./CreateVisitorForm";
-import type { CreateVisitorFormData } from "../schema/Types";
+import type { CreateVisitorFormData, VisitorByIdData } from "../schema/Types";
 import { updateVisitorAPI } from "../api/VisitorsAPI";
 
 type EditVisitorProps = {
-    data: CreateVisitorFormData
+    data: VisitorByIdData
     visitorId: number
 }
 
@@ -18,11 +18,12 @@ export default function EditVisitorForm({data, visitorId}:EditVisitorProps) {
 
     const methods = useForm({defaultValues:{
         name: data.name,
-        visitor_id: data.visitor_id,
+        company_id: data.company_id,
         document_number: data.document_number,
-        document_photo: data.document_photo,
-        license_number: data.license_number,
-        license_photo: data.license_photo,
+        document_photo_front: data.document_photo_front ?? "",
+        document_photo_back: data.document_photo_back ?? "",
+        license_number: data.license_number ?? "",
+        license_photo: data.license_photo ?? "",
     }})
     const queryClient = useQueryClient();
     const {mutate, isPending} = useMutation({
@@ -33,8 +34,9 @@ export default function EditVisitorForm({data, visitorId}:EditVisitorProps) {
         onSuccess(data) {
             queryClient.invalidateQueries({queryKey:['visitor']})
             queryClient.invalidateQueries({queryKey:['editVisitor', visitorId]})
+            queryClient.invalidateQueries({queryKey:['visitor-persons-select']})
             toast.success(data.message)
-            navigate("/visitor")
+            navigate("/people")
         },
     })
     const handleForm = (formData: CreateVisitorFormData) =>{
@@ -54,7 +56,7 @@ export default function EditVisitorForm({data, visitorId}:EditVisitorProps) {
                   </div>
                   <div className="form-nav">
                       <Link
-                          to="/visitor"
+                          to="/people"
                           className="form-nav-back"
                       >
                           <svg
@@ -82,7 +84,11 @@ export default function EditVisitorForm({data, visitorId}:EditVisitorProps) {
                       onSubmit={methods.handleSubmit(handleForm)}
                       noValidate
                       >
-                      <CreateVisitorForm initialDpiImage={data.document_photo} initialLicenseImage={data.license_photo} />
+                      <CreateVisitorForm
+                          initialDpiFrontImage={data.document_photo_front ?? undefined}
+                          initialDpiBackImage={data.document_photo_back ?? undefined}
+                          initialLicenseImage={data.license_photo ?? undefined}
+                      />
                       <button
                           type="submit"
                           disabled={isPending}

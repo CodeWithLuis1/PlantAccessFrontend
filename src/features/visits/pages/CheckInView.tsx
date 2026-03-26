@@ -37,7 +37,7 @@ export default function CheckInView() {
                 entry_time: currentTime,
                 badge_number: "",
                 agent_id: 0,
-                companions: [],
+                companions: visit.visit_companions?.map(() => ({ badge_number: "" })) ?? [],
             })
         }
     }, [visit])
@@ -47,6 +47,7 @@ export default function CheckInView() {
         onError: (error) => toast.error(error.message),
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ["visits"] })
+            queryClient.invalidateQueries({ queryKey: ["visit", visitId] })
             toast.success(data.message)
             navigate("/visits")
         },
@@ -80,7 +81,7 @@ export default function CheckInView() {
                 <div className="form-card mb-4">
                     <div className="form-card-accent"></div>
                     <div className="p-5 space-y-2 text-sm text-slate-700">
-                        <p><span className="font-semibold">Empresa / Visitante:</span> {visit.visitor?.name ?? "—"}</p>
+                        <p><span className="font-semibold">Empresa / Visitante:</span> {visit.company?.name ?? "—"}</p>
                         <p><span className="font-semibold">Departamento:</span> {visit.department?.name ?? "—"}</p>
                         <p><span className="font-semibold">Responsable:</span> {visit.responsible_person ?? "—"}</p>
                         <p><span className="font-semibold">Destino:</span> {visit.destination ?? "—"}</p>

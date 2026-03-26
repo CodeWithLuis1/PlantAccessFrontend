@@ -20,6 +20,8 @@ export default function CreateCompany() {
       },
       onSuccess:(data) =>{
         queryClient.invalidateQueries({queryKey: ["companies"]})
+        queryClient.invalidateQueries({queryKey: ["company-select"]})
+        queryClient.invalidateQueries({queryKey: ["visitors-select"]})
         toast.success(data.message)
         navigate("/company")
       }

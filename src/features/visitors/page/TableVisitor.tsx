@@ -61,7 +61,7 @@ export default function TableVisitor() {
             <TableContainer>
                 <TableHeader
                     title = "Lista de visitantes (Proveedores, Clientes)"
-                    linkTo="/visitor/create"
+                    linkTo="/people/create"
                     linkText="Crear Visitante"
                 />
                     {visitors.length> 0 ?(
@@ -73,7 +73,7 @@ export default function TableVisitor() {
                                     <Th>Empresa</Th>
                                     <Th>Número de DPI</Th>
                                     <Th>Número de Licencia</Th>
-                                    <Th align="center">Imagen del DPI || Licencia</Th>
+                                    <Th align="center">DPI (F/P) | Licencia</Th>
                                     <Th align="center">Acciones</Th>
                                 </TableRow>
                             </TableHead>
@@ -82,16 +82,27 @@ export default function TableVisitor() {
                                     <TableRow key={visitor.id}>
                                         <Td>{visitor.id}</Td>
                                         <Td>{visitor.name}</Td>
-                                        <Td>{visitor.visitor?.name ?? '—'}</Td>
+                                        <Td>{visitor.company?.name ?? '—'}</Td>
                                         <Td>{visitor.document_number}</Td>
                                         <Td>{visitor.license_number}</Td>
                                         <Td align="center">
                                             <div className="flex items-center justify-center gap-2">
-                                                {visitor.document_photo ? (
+                                                {visitor.document_photo_front ? (
                                                     <button
-                                                        onClick={() => setPreviewUrl(visitor.document_photo)}
+                                                        onClick={() => setPreviewUrl(visitor.document_photo_front!)}
                                                         className="btn-icon btn-icon-primary"
-                                                        title="Ver DPI"
+                                                        title="Ver DPI Frontal"
+                                                    >
+                                                        <Eye size={16} />
+                                                    </button>
+                                                ) : (
+                                                    <span className="text-gray-400 text-sm">—</span>
+                                                )}
+                                                {visitor.document_photo_back ? (
+                                                    <button
+                                                        onClick={() => setPreviewUrl(visitor.document_photo_back!)}
+                                                        className="btn-icon btn-icon-primary"
+                                                        title="Ver DPI Posterior"
                                                     >
                                                         <Eye size={16} />
                                                     </button>
@@ -114,7 +125,7 @@ export default function TableVisitor() {
                                         <Td align="center">
                                             <TableActions>
                                                 <Link
-                                                to={`/visitor/${visitor.id}/edit`}
+                                                to={`/people/${visitor.id}/edit`}
                                                 className="btn-icon btn-icon-primary"
                                                 title="Editar"
                                                 >

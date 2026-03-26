@@ -12,17 +12,21 @@ import { useState } from "react"
 
 type UploadFormProps = {
     showPhotoFields?: boolean;
-    initialDpiImage?: string;
+    initialDpiFrontImage?: string;
+    initialDpiBackImage?: string;
     initialLicenseImage?: string;
 };
 
-export default function CreateVisitorForm({ showPhotoFields = true, initialDpiImage, initialLicenseImage }: UploadFormProps) {
+type PhotoType = "dpi_front" | "dpi_back" | "license" | null;
+
+export default function CreateVisitorForm({ showPhotoFields = true, initialDpiFrontImage, initialDpiBackImage, initialLicenseImage }: UploadFormProps) {
     const { register, setValue, control, formState: { errors } } = useFormContext<CreateVisitorFormData>();
 
-    const [photoType, setPhotoType] = useState<"dpi" | "license" | null>(null);
+    const [photoType, setPhotoType] = useState<PhotoType>(null);
     const [openCamera, setOpenCamera] = useState(false);
 
-    const [dpiImage, setDpiImage] = useState<string | null>(initialDpiImage ?? null);
+    const [dpiFrontImage, setDpiFrontImage] = useState<string | null>(initialDpiFrontImage ?? null);
+    const [dpiBackImage, setDpiBackImage] = useState<string | null>(initialDpiBackImage ?? null);
     const [licenseImage, setLicenseImage] = useState<string | null>(initialLicenseImage ?? null);
 
     const { data: companies } = useQuery({
@@ -34,6 +38,28 @@ export default function CreateVisitorForm({ showPhotoFields = true, initialDpiIm
         value: company.id,
         label: `${company.name}`,
     })) ?? [];
+
+    const handleOpenCamera = (type: PhotoType) => {
+        setPhotoType(type);
+        setOpenCamera(true);
+    };
+
+    const handleSavePhoto = (imgBase64: string) => {
+        if (photoType === "dpi_front") {
+            setDpiFrontImage(imgBase64);
+            setValue("document_photo_front", imgBase64, { shouldValidate: true });
+        }
+        if (photoType === "dpi_back") {
+            setDpiBackImage(imgBase64);
+            setValue("document_photo_back", imgBase64, { shouldValidate: true });
+        }
+        if (photoType === "license") {
+            setLicenseImage(imgBase64);
+            setValue("license_photo", imgBase64, { shouldValidate: true });
+        }
+        setOpenCamera(false);
+        setPhotoType(null);
+    };
 
     return (
         <div className="form-container">
@@ -65,7 +91,7 @@ export default function CreateVisitorForm({ showPhotoFields = true, initialDpiIm
                     Empresa <span className="required">*</span>
                 </label>
                 <Controller
-                    name="visitor_id"
+                    name="company_id"
                     control={control}
                     rules={{ required: "El nombre de la empresa es obligatorio" }}
                     render={({ field }) => (
@@ -78,13 +104,13 @@ export default function CreateVisitorForm({ showPhotoFields = true, initialDpiIm
                             noOptionsMessage={() => "No se encontraron empresas"}
                             value={companyOptions.find((option) => option.value === field.value) || null}
                             onChange={(selected) => field.onChange(selected?.value ?? null)}
-                            classNames={getSelectClassNames(!!errors.visitor_id)}
+                            classNames={getSelectClassNames(!!errors.company_id)}
                             styles={searchableSelectStyles}
                         />
                     )}
                 />
-                {errors.visitor_id && (
-                    <ErrorMessage>{errors.visitor_id.message}</ErrorMessage>
+                {errors.company_id && (
+                    <ErrorMessage>{errors.company_id.message}</ErrorMessage>
                 )}
             </div>
 
@@ -119,6 +145,7 @@ export default function CreateVisitorForm({ showPhotoFields = true, initialDpiIm
                         type="text"
                         placeholder="2545124512414"
                         className={`form-input ${errors.license_number ? "form-input-error" : "form-input-normal"}`}
+                        {...register("license_number")}
                     />
                 </div>
                 {errors.license_number && (
@@ -127,77 +154,83 @@ export default function CreateVisitorForm({ showPhotoFields = true, initialDpiIm
             </div>
 
             {showPhotoFields && (
-                <div className="form-group">
-                    <label className="form-label font-bold">Fotografía DPI <span className="text-sm text-gray-500 font-normal">(al menos una requerida)</span></label>
+                <>
+                    {/* DPI Frontal */}
+                    <div className="form-group">
+                        <label className="form-label font-bold">
+                            Fotografía DPI — Frontal
+                            <span className="text-sm text-gray-500 font-normal ml-1">(requerida)</span>
+                        </label>
+                        {dpiFrontImage ? (
+                            <img src={dpiFrontImage} className="h-40 w-40 rounded-lg border mb-2 shadow" alt="DPI frontal" />
+                        ) : (
+                            <div className="h-40 w-40 border rounded-lg flex items-center justify-center text-gray-400 mb-2">
+                                Sin foto
+                            </div>
+                        )}
+                        <button
+                            type="button"
+                            className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg"
+                            onClick={() => handleOpenCamera("dpi_front")}
+                        >
+                            Tomar foto frontal DPI
+                        </button>
+                        <input type="hidden" {...register("document_photo_front")} />
+                    </div>
 
-                    {dpiImage ? (
-                        <img src={dpiImage} className="h-40 w-40 rounded-lg border mb-2 shadow" />
-                    ) : (
-                        <div className="h-40 w-40 border rounded-lg flex items-center justify-center text-gray-400">
-                            Sin foto
-                        </div>
-                    )}
+                    {/* DPI Posterior */}
+                    <div className="form-group">
+                        <label className="form-label font-bold">
+                            Fotografía DPI — Posterior
+                        </label>
+                        {dpiBackImage ? (
+                            <img src={dpiBackImage} className="h-40 w-40 rounded-lg border mb-2 shadow" alt="DPI posterior" />
+                        ) : (
+                            <div className="h-40 w-40 border rounded-lg flex items-center justify-center text-gray-400 mb-2">
+                                Sin foto
+                            </div>
+                        )}
+                        <button
+                            type="button"
+                            className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg"
+                            onClick={() => handleOpenCamera("dpi_back")}
+                        >
+                            Tomar foto posterior DPI
+                        </button>
+                        <input type="hidden" {...register("document_photo_back")} />
+                    </div>
 
-                    <button
-                        type="button"
-                        className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg"
-                        onClick={() => {
-                            setPhotoType("dpi");
-                            setOpenCamera(true);
-                        }}
-                    >
-                        Tomar foto DPI
-                    </button>
-                    <input type="hidden" {...register("document_photo")} />
-                </div>
-            )}
-
-            {showPhotoFields && (
-                <div className="form-group mt-6">
-                    <label className="form-label font-bold">
-                        Fotografía Licencia
-                    </label>
-
-                    {licenseImage ? (
-                        <img src={licenseImage} className="h-40 w-40 rounded-lg border mb-2 shadow" />
-                    ) : (
-                        <div className="h-40 w-40 border rounded-lg flex items-center justify-center text-gray-400">
-                            Sin foto
-                        </div>
-                    )}
-
-                    <button
-                        type="button"
-                        className="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg"
-                        onClick={() => {
-                            setPhotoType("license");
-                            setOpenCamera(true);
-                        }}
-                    >
-                        Tomar foto Licencia
-                    </button>
-
-                    {errors.license_photo && (
-                        <ErrorMessage>{errors.license_photo.message}</ErrorMessage>
-                    )}
-                </div>
+                    {/* Licencia */}
+                    <div className="form-group mt-6">
+                        <label className="form-label font-bold">
+                            Fotografía Licencia
+                        </label>
+                        {licenseImage ? (
+                            <img src={licenseImage} className="h-40 w-40 rounded-lg border mb-2 shadow" alt="Licencia" />
+                        ) : (
+                            <div className="h-40 w-40 border rounded-lg flex items-center justify-center text-gray-400 mb-2">
+                                Sin foto
+                            </div>
+                        )}
+                        <button
+                            type="button"
+                            className="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg"
+                            onClick={() => handleOpenCamera("license")}
+                        >
+                            Tomar foto Licencia
+                        </button>
+                        <input type="hidden" {...register("license_photo")} />
+                        {errors.license_photo && (
+                            <ErrorMessage>{errors.license_photo.message}</ErrorMessage>
+                        )}
+                    </div>
+                </>
             )}
 
             {openCamera && (
                 <UploadImages
                     onClose={() => setOpenCamera(false)}
-                    onSave={(imgBase64) => {
-                        if (photoType === "dpi") {
-                            setDpiImage(imgBase64);
-                            setValue("document_photo", imgBase64, { shouldValidate: true });
-                        }
-                        if (photoType === "license") {
-                            setLicenseImage(imgBase64);
-                            setValue("license_photo", imgBase64, { shouldValidate: true });
-                        }
-                        setOpenCamera(false);
-                        setPhotoType(null);
-                    }}
+                    onSave={handleSavePhoto}
                 />
             )}
 

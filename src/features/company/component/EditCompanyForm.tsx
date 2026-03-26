@@ -27,6 +27,8 @@ export default function EditCompanyForm({data, companyId}:EditCompanyFormProps) 
         onSuccess: async (data)=>{
             await queryClient.invalidateQueries({queryKey:['companies']})
             await queryClient.invalidateQueries({queryKey:['editCompany',companyId]})
+            await queryClient.invalidateQueries({queryKey:['company-select']})
+            await queryClient.invalidateQueries({queryKey:['visitors-select']})
             toast.success(data.message)
             navigate('/company')
         }

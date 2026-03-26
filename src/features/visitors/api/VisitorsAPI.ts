@@ -7,7 +7,7 @@ import {getVisitorByIdSchema} from "@/features/visitors/schema/Types"
 
 export async function createVisitorAPI(formData: CreateVisitorFormData ) {
     try {
-        const {data} = await api.post("/visitor-person",formData)
+        const {data} = await api.post("/company-person",formData)
         return data
     } catch (error) {
         if(isAxiosError(error)&& error.response){
@@ -19,9 +19,9 @@ export async function createVisitorAPI(formData: CreateVisitorFormData ) {
 export async function getVisitorAPI(page: number = 1) {
     try {
         const limit = 10
-        const {data} = await api.get("/visitor-person", {params: {page, limit}})
+        const {data} = await api.get("/company-person", {params: {page, limit}})
         const response = getVisitor.parse(data);
-        return response;  
+        return response;
 
     }catch (error) {
         if(isAxiosError(error)&& error.response){
@@ -32,7 +32,7 @@ export async function getVisitorAPI(page: number = 1) {
 
 export async function getVisitorByIdAPI(peopleId:number) {
     try {
-        const {data} = await api.get(`/visitor-person/${peopleId}`)
+        const {data} = await api.get(`/company-person/${peopleId}`)
         const response = getVisitorByIdSchema.safeParse(data.data)
         return response.data
     } catch (error) {
@@ -49,7 +49,7 @@ type PeopleTypeAPI = {
 
 export async function updateVisitorAPI({visitorId, formData}:PeopleTypeAPI) {
     try {
-        const {data} = await api.patch(`/visitor-person/${visitorId}`,formData)
+        const {data} = await api.patch(`/company-person/${visitorId}`,formData)
         return data
     } catch (error) {
         if(isAxiosError(error)&& error.response){

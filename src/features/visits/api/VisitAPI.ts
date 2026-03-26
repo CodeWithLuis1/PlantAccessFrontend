@@ -54,8 +54,9 @@ export async function getVisitByIdAPI(visitId: number) {
         return visitResponseSchema.parse(data.data)
     } catch (error) {
         if (isAxiosError(error) && error.response) {
-            throw new Error(error.message)
+            throw new Error(error.response.data.message ?? error.message)
         }
+        throw error
     }
 }
 
@@ -70,6 +71,7 @@ export async function checkInAPI({ visitId, formData }: { visitId: number; formD
             console.error("checkInAPI - error response:", error.response.data)
             throw new Error(error.response.data.message)
         }
+        throw error
     }
 }
 
@@ -81,6 +83,7 @@ export async function checkOutAPI({ visitId, formData }: { visitId: number; form
         if (isAxiosError(error) && error.response) {
             throw new Error(error.response.data.message)
         }
+        throw error
     }
 }
 
@@ -98,7 +101,7 @@ export async function cancelVisitAPI(visitId: number) {
 // Obtener visitantes (empresas/proveedores) para el select de crear visita
 export async function getVisitorsForSelectAPI() {
     try {
-        const { data } = await api.get("/visitor", { params: { all: true } })
+        const { data } = await api.get("/company", { params: { all: true } })
         const parsed = visitorSelectSchema.array().safeParse(data.response)
         if (!parsed.success) throw new Error("Formato inválido de visitante para el select")
         return parsed.data
@@ -136,7 +139,7 @@ export async function deleteVisitAPI(visitId: number) {
 // Obtener personas de un visitante/empresa especifico (para el select del check-in)
 export async function getVisitorPersonsByVisitorAPI(visitorId: number) {
     try {
-        const { data } = await api.get(`/visitor-person/by-visitor/${visitorId}`)
+        const { data } = await api.get(`/company-person/by-company/${visitorId}`)
         const parsed = visitorPersonSelectSchema.array().safeParse(data.data)
         if (!parsed.success) throw new Error("Formato inválido de personas del visitante")
         return parsed.data

@@ -15,8 +15,8 @@ export default function CreateVisit() {
     const today = new Date().toISOString().split("T")[0]
 
     const initialValues: CreateVisitFormData = {
-        visitor_id: 0,
-        visitor_person_id: 0,
+        company_id: 0,
+        company_person_id: 0,
         date: today,
         department_id: 0,
         responsible_person: user?.name?.toUpperCase() ?? "",

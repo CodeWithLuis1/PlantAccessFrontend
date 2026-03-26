@@ -2,14 +2,14 @@ import { paginationSchema } from "@/shared/schemas/paginateSchemas"
 import { z } from "zod"
 
 export const createVisitSchema = z.object({
-    visitor_id: z.number(),
-    visitor_person_id: z.number(),
+    company_id: z.number(),
+    company_person_id: z.number(),
     date: z.string(),
     department_id: z.number(),
     responsible_person: z.string(),
     destination: z.string(),
     companions: z.array(z.object({
-        visitor_person_id: z.number(),
+        company_person_id: z.number(),
     })).optional(),
 })
 
@@ -26,11 +26,11 @@ export const checkOutSchema = z.object({
     exit_time: z.string(),
 })
 
-const visitorPersonSchema = z.object({
+const companyPersonSchema = z.object({
     id: z.number(),
     name: z.string(),
     document_number: z.string(),
-    document_photo: z.string().nullable().optional(),
+    document_photo_front: z.string().nullable().optional(),
     license_number: z.string().nullable().optional(),
     license_photo: z.string().nullable().optional(),
 })
@@ -41,23 +41,23 @@ export const visitResponseSchema = z.object({
     entry_time: z.string().nullable().optional(),
     exit_time: z.string().nullable().optional(),
     visit_status_id: z.number().nullable().optional(),
-    visitor_id: z.number().nullable().optional(),
-    visitor_person_id: z.number().nullable().optional(),
+    company_id: z.number().nullable().optional(),
+    company_person_id: z.number().nullable().optional(),
     department_id: z.number().nullable().optional(),
     destination: z.string().nullable().optional(),
     responsible_person: z.string().nullable().optional(),
     badge_number: z.string().nullable().optional(),
     agent_id: z.number().nullable().optional(),
     visit_status: z.object({ id: z.number(), name: z.string() }).nullable().optional(),
-    visitor: z.object({ id: z.number(), name: z.string() }).nullable().optional(),
-    visitor_person: visitorPersonSchema.nullable().optional(),
+    company: z.object({ id: z.number(), name: z.string() }).nullable().optional(),
+    company_person: companyPersonSchema.nullable().optional(),
     department: z.object({ id: z.number(), name: z.string() }).nullable().optional(),
     agent: z.object({ id: z.number(), name: z.string() }).nullable().optional(),
     visit_companions: z.array(z.object({
         id: z.number(),
-        visitor_person_id: z.number(),
+        company_person_id: z.number(),
         badge_number: z.string().nullable().optional(),
-        visitor_person: z.object({ id: z.number(), name: z.string(), document_number: z.string() }).nullable().optional(),
+        company_person: z.object({ id: z.number(), name: z.string(), document_number: z.string() }).nullable().optional(),
     })).nullable().optional(),
 })
 

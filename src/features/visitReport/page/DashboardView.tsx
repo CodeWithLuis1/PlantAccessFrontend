@@ -1,8 +1,9 @@
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,ResponsiveContainer,} from "recharts"
-import {Users, UserCheck, Building2, Clock, CheckCircle, XCircle, CalendarDays,} from "lucide-react"
+import {Users, UserCheck, Building2, Clock, CheckCircle, XCircle, CalendarDays, FileDown,} from "lucide-react"
 import { getDashboardSummaryAPI, getInPlantAtAPI, getVisitsByCompanyAPI } from "@/features/visitReport/api/ReportsAPI"
+import { ExcelReportAPI } from "@/features/visitReport/api/ExcelReportAPI"
 
 const TODAY = new Date().toISOString().split("T")[0]
 
@@ -46,6 +47,22 @@ export default function DashboardView() {
     const [companyFrom,    setCompanyFrom]    = useState(TODAY.slice(0, 7) + "-01")
     const [companyTo,      setCompanyTo]      = useState(TODAY)
     const [inPlantSearch,  setInPlantSearch]  = useState("")
+    const [downloadingExcel, setDownloadingExcel] = useState(false)
+
+    async function handleDownloadExcel() {
+        setDownloadingExcel(true)
+        try {
+            const blob = await ExcelReportAPI({ from: companyFrom, to: companyTo })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement("a")
+            a.href = url
+            a.download = `reporte_${companyFrom}_${companyTo}.xlsx`
+            a.click()
+            URL.revokeObjectURL(url)
+        } finally {
+            setDownloadingExcel(false)
+        }
+    }
 
     const { data: summary, isLoading: loadingSummary } = useQuery({
         queryKey: ["dashboard-summary", summaryDate],
@@ -137,6 +154,14 @@ export default function DashboardView() {
                                 onChange={(e) => setCompanyTo(e.target.value)}
                                 className="border border-slate-300 rounded-lg px-2 py-1 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-400"
                             />
+                            <button
+                                onClick={handleDownloadExcel}
+                                disabled={downloadingExcel}
+                                className="flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
+                            >
+                                <FileDown size={14} />
+                                {downloadingExcel ? "Descargando..." : "Excel"}
+                            </button>
                         </div>
                     </div>
 

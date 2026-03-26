@@ -28,9 +28,9 @@ function VisitSummary({ visit }: { visit: NonNullable<Awaited<ReturnType<typeof 
                         <span className={STATUS_BADGE[statusName] ?? "badge-info"}>{statusName}</span>
                     )}
                 </div>
-                <p><span className="font-semibold">Empresa / Visitante:</span> {visit.visitor?.name ?? "—"}</p>
-                {visit.visitor_person && (
-                    <p><span className="font-semibold">Persona:</span> {visit.visitor_person.name}</p>
+                <p><span className="font-semibold">Empresa / Visitante:</span> {visit.company?.name ?? "—"}</p>
+                {visit.company_person && (
+                    <p><span className="font-semibold">Persona:</span> {visit.company_person.name}</p>
                 )}
                 <p><span className="font-semibold">Departamento:</span> {visit.department?.name ?? "—"}</p>
                 <p><span className="font-semibold">Responsable:</span> {visit.responsible_person ?? "—"}</p>
@@ -61,13 +61,13 @@ function EditSection({ visitId, visit }: {
     const queryClient = useQueryClient()
 
     const defaultValues: CreateVisitFormData = {
-        visitor_id: visit.visitor_id ?? 0,
-        visitor_person_id: visit.visitor_person_id ?? 0,
+        company_id: visit.company_id ?? 0,
+        company_person_id: visit.company_person_id ?? 0,
         date: visit.date ? visit.date.split("T")[0] : "",
         department_id: visit.department_id ?? 0,
         responsible_person: visit.responsible_person ?? "",
         destination: visit.destination ?? "",
-        companions: visit.visit_companions?.map(c => ({ visitor_person_id: c.visitor_person_id })) ?? [],
+        companions: visit.visit_companions?.map(c => ({ company_person_id: c.company_person_id ?? 0 })) ?? [],
     }
 
     const methods = useForm<CreateVisitFormData>({ defaultValues, mode: "onChange" })
@@ -271,7 +271,16 @@ export default function EditVisit() {
 
                 {status === "EN PLANTA" && (
                     <>
-                        {canCheckOut && <CheckOutCard visitId={Number(visitId)} />}
+                        {canCheckOut ? (
+                            <CheckOutCard visitId={Number(visitId)} />
+                        ) : (
+                            <div className="form-card">
+                                <div className="form-card-accent bg-blue-500"></div>
+                                <div className="p-5 text-sm text-slate-600">
+                                    <p>El visitante está actualmente en planta. Pendiente de registro de salida.</p>
+                                </div>
+                            </div>
+                        )}
                     </>
                 )}
 

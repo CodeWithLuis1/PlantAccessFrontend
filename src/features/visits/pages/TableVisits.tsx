@@ -184,17 +184,17 @@ export default function TableVisits() {
                                         </Td>
                                         <Td>
                                             <div className="text-sm">
-                                                <p className="font-medium">{visit.visitor?.name ?? "—"}</p>
-                                                {visit.visitor_person && (
-                                                    <p className="text-slate-400">{visit.visitor_person.name}</p>
+                                                <p className="font-medium">{visit.company?.name ?? "—"}</p>
+                                                {visit.company_person && (
+                                                    <p className="text-slate-400">{visit.company_person.name}</p>
                                                 )}
                                             </div>
                                         </Td>
                                         <Td align="center">
                                             <div className="flex items-center justify-center gap-2">
-                                                {visit.visitor_person?.document_photo ? (
+                                                {visit.company_person?.document_photo_front ? (
                                                     <button
-                                                        onClick={() => setPreviewUrl(visit.visitor_person!.document_photo!)}
+                                                        onClick={() => setPreviewUrl(visit.company_person!.document_photo_front!)}
                                                         className="btn-icon btn-icon-primary"
                                                         title="Ver DPI"
                                                     >
@@ -203,9 +203,9 @@ export default function TableVisits() {
                                                 ) : (
                                                     <span className="text-gray-400 text-sm">—</span>
                                                 )}
-                                                {visit.visitor_person?.license_photo ? (
+                                                {visit.company_person?.license_photo ? (
                                                     <button
-                                                        onClick={() => setPreviewUrl(visit.visitor_person!.license_photo!)}
+                                                        onClick={() => setPreviewUrl(visit.company_person!.license_photo!)}
                                                         className="btn-icon btn-icon-primary"
                                                         title="Ver Licencia"
                                                     >
@@ -221,8 +221,8 @@ export default function TableVisits() {
                                                 <ul className="text-sm space-y-1">
                                                     {visit.visit_companions.map((c, i) => (
                                                         <li key={c.id ?? i} className="text-slate-600">
-                                                            <span className="font-medium">{c.visitor_person?.name ?? "—"}</span>
-                                                            <span className="text-slate-400 ml-1">DPI: {c.visitor_person?.document_number ?? "—"}</span>
+                                                            <span className="font-medium">{c.company_person?.name ?? "—"}</span>
+                                                            <span className="text-slate-400 ml-1">DPI: {c.company_person?.document_number ?? "—"}</span>
                                                         </li>
                                                     ))}
                                                 </ul>

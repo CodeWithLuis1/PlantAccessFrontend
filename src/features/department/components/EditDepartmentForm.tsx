@@ -32,6 +32,7 @@ export default function EditDepartmentForm({data,departmentId}:EditRoleProps) {
         onSuccess(data){
             queryClient.invalidateQueries({queryKey:["departments"]})
             queryClient.invalidateQueries({queryKey:['editDepartment', departmentId]})
+            queryClient.invalidateQueries({queryKey:["department-select"]})
             toast.success(data.message)
             navigate('/department')
         }

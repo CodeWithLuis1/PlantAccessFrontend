@@ -30,6 +30,7 @@ export default function CheckOutView() {
         onError: (error) => toast.error(error.message),
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ["visits"] })
+            queryClient.invalidateQueries({ queryKey: ["visit", visitId] })
             toast.success(data.message)
             navigate("/visits")
         },
@@ -61,9 +62,9 @@ export default function CheckOutView() {
                     <div className="form-card mb-4">
                         <div className="form-card-accent"></div>
                         <div className="p-5 space-y-2 text-sm text-slate-700">
-                            <p><span className="font-semibold">Empresa / Visitante:</span> {visit.visitor?.name ?? "—"}</p>
-                            <p><span className="font-semibold">Persona que ingresó:</span> {visit.visitor_person?.name ?? "—"}</p>
-                            <p><span className="font-semibold">DPI:</span> {visit.visitor_person?.document_number ?? "—"}</p>
+                            <p><span className="font-semibold">Empresa / Visitante:</span> {visit.company?.name ?? "—"}</p>
+                            <p><span className="font-semibold">Persona que ingresó:</span> {visit.company_person?.name ?? "—"}</p>
+                            <p><span className="font-semibold">DPI:</span> {visit.company_person?.document_number ?? "—"}</p>
                             <p><span className="font-semibold">Entrada:</span> {visit.entry_time ?? "—"}</p>
                             <p><span className="font-semibold">Gafete:</span> {visit.badge_number ?? "—"}</p>
                             <p><span className="font-semibold">Acompañantes:</span> {visit.visit_companions?.length ? `${visit.visit_companions.length}` : "Ninguno"}</p>
